@@ -29,16 +29,16 @@ Analyzer::Analyzer(int argc,char **argv){
     n=false;
     a=false;
     h=false;
-    o=false;
+    s=false;
     num_read_history=10;
     num_read_strange=10;
-    char argMatchList[][3]={"-l","-n","-a","-h","-o","d","dl","ld","nl","ln"};
+    char argMatchList[][3]={"-l","-n","-a","-h","-s","d","dl","ld","nl","ln"};
     if(argc>=2){
         if(!(strcmp(argMatchList[0],argv[1]))) {l=true;__argn__++;cout<<'l'<<endl;}
         if(!(strcmp(argMatchList[1],argv[1]))) {n=true;__argn__++;cout<<'n'<<endl;}
         if(!(strcmp(argMatchList[2],argv[1]))) {a=true;__argn__++;cout<<'a'<<endl;}
         if(!(strcmp(argMatchList[3],argv[1]))) {h=true;__argn__++;cout<<'h'<<endl;}
-        if(!(strcmp(argMatchList[4],argv[1]))) {o=true;__argn__++;cout<<'o'<<endl;}
+        if(!(strcmp(argMatchList[4],argv[1]))) {s=true;__argn__++;cout<<'s'<<endl;}
         if(!(strcmp(argMatchList[5],argv[1])&&strcmp(argMatchList[6],argv[1])&&strcmp(argMatchList[7],argv[1]))) {d=true;l=true;__argn__++;}
         if(!(strcmp(argMatchList[8],argv[1])&&strcmp(argMatchList[9],argv[1]))) {d=true;n=true;__argn__++;}
 
