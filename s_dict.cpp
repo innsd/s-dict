@@ -31,30 +31,30 @@ int main(int argc,char *argv[]){
         File_reader.showHis();
     }else if(ptr_Analyz->getA()){
         //生词本添加
+        //没写好
     }else if(ptr_Analyz->getL()||ptr_Analyz->getN()){
         //查询
         Interpretation InterpretedDataObj;//把翻译好的数据封装成对象
-        if(ptr_Analyz->getN()){//优先判断是否网络查询
+        if(ptr_Analyz->getN()){//先判断是否网络查询,如果不是网络查询，那就是本地了
             //网络查询
             //暂时不打算写，因为本地使用的55000条单词数据就是从网上抓取的
             //感觉写网络查询的意义好像不是很大
             //
-        }else{
+        }else{//本地查询
             query qer(*ptr_Analyz);//生成一个查询器
-            //本地查询
             #ifdef _DEBUG_
             cout<<"开始本地查询"<<endl;
             #endif
-            InterpretedDataObj=qer.search();//查询器，从数据库里面分析数据，返回一个封装好的对象
+            InterpretedDataObj=qer.getInterpretedDataObj();//查询器，从数据库里面分析数据，返回一个封装好的对象
            if(!(InterpretedDataObj.isSignificFunc())){//如果没有查到，就会返回一个无效的对象，对象的isSignificFunc()方法返回为0
                 cout<<"没有查询到本地结果,正在进行网络查询..."<<endl;
                 //网络查询
-                //a=...
+                //没写好
             }
         }
         if(!(InterpretedDataObj.isSignificFunc())){
             cout<<"没有查询到单词的意思！\n";
-            return 2;
+            return 0;
         }
         #ifdef _DEBUG_
         cout<<"---------DEBUG---------"<<endl;
@@ -67,8 +67,9 @@ int main(int argc,char *argv[]){
         }
         storageWord owo(*ptr_Analyz,InterpretedDataObj);
         owo.historyRecord();
-    }else if(ptr_Analyz->getO()){
-        //输出生词本
+    }else if(ptr_Analyz->getS()){
+        //显示生词本
+        //没写好
     }
     return 0;
 }

@@ -7,7 +7,7 @@
 *N：Net网络查询 sdict -n {word}
 *A：add生词本，sdict -a默认添加上一次查询的单词到生词本sdict -a {word}添加指定单词到生次本
 *H：历史记录查询，默认显示十条历史记录，
-*O：
+*S：显示生词本，sdict -s {num}默认显示十条生词
 *D：详细信息查询，默认查询出来的都显示简要信息，加d参数显示单词详细音标例句信息用法sdict -d {word}/sdict -(ld/dl) {word} 查询本地详细单词信息
 *sdict -(nd/dn) {word}查询网络详细信息
 */
@@ -33,7 +33,7 @@ class Analyzer{
         bool getA(){return a;}
         bool getH(){return h;}
         bool getD(){return d;}
-        bool getO(){return o;}
+        bool getS(){return s;}
         bool check_arg();
         bool check_cache();
         bool check_dict();
@@ -52,7 +52,7 @@ class Analyzer{
         bool a;//添加生次本
         bool h;//是否查询历史记录
         bool d;//是否显示详细信息
-        bool o;//
+        bool s;//显示生次本
         int num_read_history;
         int num_read_strange;
 };

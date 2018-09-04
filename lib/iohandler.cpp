@@ -1,6 +1,7 @@
 #include "../include/interpretation.h"
 #include "../include/iohandler.h"
 #include "../include/analyzer.h"
+#include "../include/libsql.h"
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -8,6 +9,9 @@
 #include <cstdlib>
 #include <sqlite3.h>
 #include <iterator>
+#include <string>
+#include <vector>
+#include <cstring>
 using std::endl;
 using std::ofstream;
 using std::ifstream;
@@ -15,14 +19,10 @@ using std::map;
 using std::pair;
 using std::iterator;
 using std::ios_base;
-<<<<<<< HEAD:lib/iohandler.cpp
 using std::cout;
+using std::string;
+Interpretation inquire_core(sqlite3 * db,string word);
 iohandler::iohandler(Analyzer& _info):word(_info.getWord()),dict_file(_info.getDict_file()),cache_path(_info.getCache_path()),strange_word_path(_info.getStrange_word_path()),his_path(_info.getHis_path()),read_history(_info.getNumReadHis()),read_strange(_info.getNumReadStr()){}
-Interpretation inquire_core(sqlite3 * db){
-    Interpretation tempTransDataObj;
-    //还没写好
-    return tempTransDataObj;
-}
 Interpretation query::getInterpretedDataObj(){//包装一下
     int rc;
     sqlite3 * db;
@@ -31,7 +31,76 @@ Interpretation query::getInterpretedDataObj(){//包装一下
     cout<<"字典文件路径："<<getDic_file()<<endl;
     #endif
     if(rc){cout<<"字典文件Error"<<endl;exit(0);}
-    return inquire_core(db);
+    return inquire_core(db,getWord());
+}
+Interpretation inquire_core(sqlite3 * db,string word){
+    Interpretation tempTransDataObj;
+    char *ErrorInfo=0;
+    int rc;
+    map<string,string> WordData;
+    string sql_cmd="select word,ps,pos,acceptation,orig,trans from words where word=\'";
+    sql_cmd=sql_cmd+word+"\';";
+    rc=sqlite3_exec(db,sql_cmd.c_str(),callback_sqlite,(void *)&WordData,&ErrorInfo);
+    if(rc!=SQLITE_OK){
+        cout<<"SQL ERROR:"<<ErrorInfo<<endl;
+        sqlite3_free(ErrorInfo);
+    }else{
+        #ifdef _DEBUG_
+        cout<<"查询数据库成功"<<endl;
+        #endif
+    }
+    sqlite3_close(db);
+    string tempDataOfTrans;
+    char *p;
+    char *s;
+    const char *delim="\n";
+    //"word","phonetic","pos","acceptation","orig","trans"
+    map<string,string>::iterator it;
+    it=WordData.find(string("word"));
+    tempDataOfTrans=it->second;
+    tempTransDataObj.setWord(tempDataOfTrans);
+    it=WordData.find(string("phonetic"));
+    tempDataOfTrans=it->second;
+    s=(char *)tempDataOfTrans.c_str();
+    p=strtok(s,delim);
+    while(p){
+        tempTransDataObj.addPhonetic(string(p));
+        p=strtok(NULL,delim);
+    }
+    it=WordData.find(string("pos"));
+    tempDataOfTrans=it->second;
+    s=(char *)tempDataOfTrans.c_str();
+    p=strtok(s,delim);
+    while(p){
+        tempTransDataObj.addPos(string(p));
+        p=strtok(NULL,delim);
+    }
+    it=WordData.find(string("acceptation"));
+    tempDataOfTrans=it->second;
+    s=(char *)tempDataOfTrans.c_str();
+    p=strtok(s,delim);
+    while(p){
+        tempTransDataObj.addAcceptation(string(p));
+        p=strtok(NULL,delim);
+    }
+    it=WordData.find(string("orig"));
+    tempDataOfTrans=it->second;
+    s=(char *)tempDataOfTrans.c_str();
+    p=strtok(s,delim);
+    while(p){
+        tempTransDataObj.addOrig(string(p));
+        p=strtok(NULL,delim);
+    }
+    it=WordData.find(string("trans"));
+    tempDataOfTrans=it->second;
+    s=(char *)tempDataOfTrans.c_str();
+    p=strtok(s,delim);
+    while(p){
+        tempTransDataObj.addTrans(string(p));
+        p=strtok(NULL,delim);
+    }
+    tempTransDataObj.setSginificative(true);
+    return tempTransDataObj;
 }
 /*//缓存功能废弃。。。没啥卵用
 void storageWord::cache(){
@@ -81,12 +150,6 @@ void RecordReader::showHis(){
     fin.close();
 }
 void RecordReader::showStrange(){
-=======
-
-iohandler::iohandler(Analyzer& _info):word(_info.getWord()),dict_file(_info.getDict_file()),cache_path(_info.getCache_path()),strange_word_path(_info.getStrange_word_path()),his_path(_info.getHis_path()),read_history(_info.getNumReadHis()),read_strange(_info.getNumReadStr()){}
-
-Interpretation query::search(){//包装一下
->>>>>>> daf46708b41d3b89688231f5876e02f966127a0b:source/bin/iohandler.cpp
     ifstream fin;
     fin.open(getStrang_word_path()+STRANGE_WORD_NAME,ios_base::in);
     show_core(fin,getRead_Str_Num());
@@ -150,57 +213,4 @@ Interpretation inquire_core(ifstream& fin,string word){//核心函数
     fin.close();
     return Interpretation();
 }
-<<<<<<< HEAD:lib/iohandler.cpp
 */
-=======
-
-void storageWord::cache(){
-    string filepath=getCache_path()+CACHE_NAME;
-    ofstream fout(filepath,ios_base::out|ios_base::app);
-    fout<<translation.getWord()<<translation.getphonetic()<<translation.getExplain()<<endl;
-    fout.close();
-}
-void storageWord::strange(){
-    string filepath=getStrang_word_path()+STRANGE_WORD_NAME;
-    ofstream fout(filepath,ios_base::out|ios_base::app);
-    fout<<translation.getWord()<<translation.getphonetic()<<translation.getExplain()<<endl;
-    fout.close();
-}
-void storageWord::historyRecord(){
-    string filepath=getHis_path()+HISTORICAL_RECORD_NAME;
-    string tempfile=getHis_path()+"h.temp";
-    string temp;
-    ofstream fout(tempfile,ios_base::out);
-    ifstream fin(filepath,ios_base::in);
-    fout<<translation.getWord()<<translation.getphonetic()<<translation.getExplain()<<endl;
-    while(!fin.eof()){
-        getline(fin,temp);
-        fout<<temp<<endl;;
-    }
-    fin.close();
-    fout.close();
-    system(string("rm "+filepath).c_str());
-    system(string("mv "+tempfile+" "+filepath).c_str());
-}
-void RecordReader::show_core(ifstream& fin,int n){
-    int i=0;
-    string temp;
-    while((!fin.eof())&&i<n){
-        getline(fin,temp);
-        cout<<temp<<endl;
-        i++;
-    }
-}
-void RecordReader::show_his(){
-    ifstream fin;
-    fin.open(getHis_path()+HISTORICAL_RECORD_NAME,ios_base::in);
-    show_core(fin,getRead_His_Num());
-    fin.close();
-}
-void RecordReader::show_str(){
-    ifstream fin;
-    fin.open(getStrang_word_path()+STRANGE_WORD_NAME,ios_base::in);
-    show_core(fin,getRead_Str_Num());
-    fin.close();
-}
->>>>>>> daf46708b41d3b89688231f5876e02f966127a0b:source/bin/iohandler.cpp

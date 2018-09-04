@@ -18,13 +18,8 @@ using std::string;
 class iohandler{
     public:
         iohandler(Analyzer& _info);
-<<<<<<< HEAD:include/iohandler.h
         int getRead_His_Num(){return read_history;}//查询历史记录的条数
         int getRead_Str_Num(){return read_strange;}//查询生词的条数
-=======
-        int getRead_His_Num(){return read_history;}
-        int getRead_Str_Num(){return read_strange;}
->>>>>>> daf46708b41d3b89688231f5876e02f966127a0b:source/header/iohandler.h
         string getWord(){return word;}
         string getDic_file(){return dict_file;}
         string getCache_path(){return cache_path;}

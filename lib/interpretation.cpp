@@ -54,3 +54,24 @@ string Interpretation::getAccString(){
     }
     return temp;
 }
+void Interpretation::setWord(string w){
+    this->word=w;
+}
+void Interpretation::addPhonetic(string p){
+    this->phonetic.push_back(p);
+}
+void Interpretation::addPos(string p){
+    this->pos.push_back(p);
+}
+void Interpretation::addAcceptation(string acc){
+    this->acceptation.push_back(acc);
+}
+void Interpretation::addOrig(string o){
+    this->orig.push_back(o);
+}
+void Interpretation::addTrans(string t){
+    this->trans.push_back(t);
+}
+void Interpretation::setSginificative(bool b){
+    isSignificative=b;
+}

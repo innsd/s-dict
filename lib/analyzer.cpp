@@ -72,7 +72,7 @@ Analyzer::Analyzer(int argc,char **argv){
         string key_;
         string value_;
         int sign;
-        map<string,string> conf;
+        map<string,string> conf;//用于存储配置文件信息的容器，<string,string> = <{设置项},{详细信息}>
         while(!fin.eof()){
             getline(fin,temp);
             cout<<"debug:"<<temp<<endl;
@@ -82,11 +82,13 @@ Analyzer::Analyzer(int argc,char **argv){
             cout<<"key:"<<key_<<"\tvalue"<<value_<<endl;
             conf.insert(pair<string,string>(key_,value_));
         }
-        cout<<"声明迭代器"<<endl;
         map<string,string>::iterator it;
+        #ifdef _DEBUG_
+        cout<<"声明迭代器"<<endl;//debug
         for(it=conf.begin();it!=conf.end();it++){
             cout<<it->first<<'\t'<<it->second<<endl;
         }
+        #endif
         it=conf.find(string("dict"));
         cout<<"迭代器赋值"<<endl;
         dict_file=it->second;

@@ -21,6 +21,13 @@ class Interpretation{
         vector<string> getPos(){return pos;}
         vector<string> getOrig(){return orig;}
         vector<string> getTrans(){return trans;}
+        void setWord(string);
+        void setSginificative(bool);
+        void addPhonetic(string);
+        void addPos(string);
+        void addAcceptation(string);
+        void addOrig(string);
+        void addTrans(string);
     private:
         bool isSignificative;
         string word;
