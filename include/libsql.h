@@ -15,4 +15,5 @@ static int callback_sqlite(void * data,int argc,char **argv,char **azColName){
     for(i=0;i<argc;i++){
         (*(map<string,string>*)data).insert(pair<string,string>(keys[i],argv[i]?argv[i]:"NULL"));
     }
+    return 0;
 }
