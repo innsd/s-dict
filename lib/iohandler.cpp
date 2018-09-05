@@ -2,6 +2,7 @@
 #include "../include/iohandler.h"
 #include "../include/analyzer.h"
 #include "../include/libsql.h"
+#include "../include/def.h"
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -38,26 +39,41 @@ Interpretation inquire_core(sqlite3 * db,string word){
     char *ErrorInfo=0;
     int rc;
     map<string,string> WordData;
+    WordData.insert(pair<string,string>("isExistWord","false"));
     string sql_cmd="select word,ps,pos,acceptation,orig,trans from words where word=\'";
     sql_cmd=sql_cmd+word+"\';";
     rc=sqlite3_exec(db,sql_cmd.c_str(),callback_sqlite,(void *)&WordData,&ErrorInfo);
     if(rc!=SQLITE_OK){
         cout<<"SQL ERROR:"<<ErrorInfo<<endl;
         sqlite3_free(ErrorInfo);
+        exit(0);
     }else{
         #ifdef _DEBUG_
         cout<<"查询数据库成功"<<endl;
         #endif
     }
     sqlite3_close(db);
+    map<string,string>::iterator it;
+    it=WordData.find(string("isExistWord"));
+    if(it->second!="true"){
+        return tempTransDataObj;
+    }
     string tempDataOfTrans;
     char *p;
     char *s;
-    const char *delim="\n";
+    const char *delim="|QAQ|";
+    #ifdef _DEBUG_
+    cout<<"分割符："<<delim<<endl;
+    #endif
     //"word","phonetic","pos","acceptation","orig","trans"
-    map<string,string>::iterator it;
     it=WordData.find(string("word"));
+    #ifdef _DEBUG_
+    cout<<"查询的单词："<<it->second<<endl;
+    #endif
     tempDataOfTrans=it->second;
+    #ifdef _DEBUG_
+    cout<<"单词str："<<tempDataOfTrans<<endl;
+    #endif
     tempTransDataObj.setWord(tempDataOfTrans);
     it=WordData.find(string("phonetic"));
     tempDataOfTrans=it->second;
@@ -77,6 +93,9 @@ Interpretation inquire_core(sqlite3 * db,string word){
     }
     it=WordData.find(string("acceptation"));
     tempDataOfTrans=it->second;
+    #ifdef _DEBUG_
+    cout<<"意思str："<<tempDataOfTrans<<endl;
+    #endif
     s=(char *)tempDataOfTrans.c_str();
     p=strtok(s,delim);
     while(p){
@@ -85,6 +104,9 @@ Interpretation inquire_core(sqlite3 * db,string word){
     }
     it=WordData.find(string("orig"));
     tempDataOfTrans=it->second;
+    #ifdef _DEBUG_
+    cout<<"例句str："<<tempDataOfTrans<<endl;
+    #endif
     s=(char *)tempDataOfTrans.c_str();
     p=strtok(s,delim);
     while(p){
@@ -93,6 +115,9 @@ Interpretation inquire_core(sqlite3 * db,string word){
     }
     it=WordData.find(string("trans"));
     tempDataOfTrans=it->second;
+    #ifdef _DEBUG_
+    cout<<"翻译str："<<tempDataOfTrans<<endl;
+    #endif
     s=(char *)tempDataOfTrans.c_str();
     p=strtok(s,delim);
     while(p){
@@ -102,7 +127,7 @@ Interpretation inquire_core(sqlite3 * db,string word){
     tempTransDataObj.setSginificative(true);
     return tempTransDataObj;
 }
-/*//缓存功能废弃。。。没啥卵用
+/*//缓存功能废弃。。。没啥用
 void storageWord::cache(){
     string filepath=getCache_path()+CACHE_NAME;
     ofstream fout(filepath,ios_base::out|ios_base::app);
@@ -119,6 +144,9 @@ void storageWord::strange(){
     fout.close();
 }
 void storageWord::historyRecord(){//把这次查询的历史记录写入开头的办法就是，先写入一个临时文件，然后把原来的文件写入临时文件后面，然后用临时文件替换源文件
+    #ifdef _DEBUG_
+    cout<<"存储历史记录中"<<endl;
+    #endif
     string filepath=getHis_path()+HISTORICAL_RECORD_NAME;
     string tempfile=getHis_path()+"h.temp";
     string temp;

@@ -3,7 +3,7 @@
 #include "include/exceptions.h"
 #include "include/interpretation.h"
 #include "include/iohandler.h"
-#define _DEBUG_
+#include "include/def.h"
 int main(int argc,char *argv[]){
     using std::cerr;
     using std::cout;
@@ -12,7 +12,9 @@ int main(int argc,char *argv[]){
     unique_ptr<Analyzer> ptr_Analyz;//指向分析器的一个智能指针
     try{
         ptr_Analyz=unique_ptr<Analyzer>(new Analyzer(argc,argv));//用命令行传入的参数，初始化这个分析器
+        #ifdef _DEBUG_
         cout<<"分析器初始化完成！"<<endl;
+        #endif
         ptr_Analyz->check();
     }catch(ArgException& e){
         cerr << e.what() << '\n';

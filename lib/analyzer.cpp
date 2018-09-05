@@ -1,6 +1,7 @@
 #include "../include/analyzer.h"
 #include "../include/exceptions.h"
 #include "../include/iohandler.h"
+#include "../include/def.h"
 //#include "../header/macro.h"
 #include <string>
 #include <cstring>
@@ -11,7 +12,6 @@
 #include <dirent.h>
 #include <map>
 #include <algorithm>
-#define _DEBUG_
 using std::ifstream;
 using std::map;
 using std::fstream;
@@ -32,16 +32,15 @@ Analyzer::Analyzer(int argc,char **argv){
     s=false;
     num_read_history=10;
     num_read_strange=10;
-    char argMatchList[][3]={"-l","-n","-a","-h","-s","d","dl","ld","nl","ln"};
+    char argMatchList[][4]={"-l","-n","-a","-h","-s","-d","-dl","-ld","-nl","-ln"};
     if(argc>=2){
-        if(!(strcmp(argMatchList[0],argv[1]))) {l=true;__argn__++;cout<<'l'<<endl;}
-        if(!(strcmp(argMatchList[1],argv[1]))) {n=true;__argn__++;cout<<'n'<<endl;}
-        if(!(strcmp(argMatchList[2],argv[1]))) {a=true;__argn__++;cout<<'a'<<endl;}
-        if(!(strcmp(argMatchList[3],argv[1]))) {h=true;__argn__++;cout<<'h'<<endl;}
-        if(!(strcmp(argMatchList[4],argv[1]))) {s=true;__argn__++;cout<<'s'<<endl;}
+        if(!(strcmp(argMatchList[0],argv[1]))) {l=true;__argn__++;}
+        if(!(strcmp(argMatchList[1],argv[1]))) {n=true;__argn__++;}
+        if(!(strcmp(argMatchList[2],argv[1]))) {a=true;__argn__++;}
+        if(!(strcmp(argMatchList[3],argv[1]))) {h=true;__argn__++;}
+        if(!(strcmp(argMatchList[4],argv[1]))) {s=true;__argn__++;}
         if(!(strcmp(argMatchList[5],argv[1])&&strcmp(argMatchList[6],argv[1])&&strcmp(argMatchList[7],argv[1]))) {d=true;l=true;__argn__++;}
         if(!(strcmp(argMatchList[8],argv[1])&&strcmp(argMatchList[9],argv[1]))) {d=true;n=true;__argn__++;}
-
     }else if(argc<=1){
         throw ArgException();//没有任何参数，抛出异常
     }
@@ -64,10 +63,14 @@ Analyzer::Analyzer(int argc,char **argv){
     }
     ifstream fin("/home/cheng/.simple-dict/config.cfg",ios_base::in);
     if(!fin){
+        #ifdef _DEBUG_
         std::cout<<"读取配置文件失败\n";
+        #endif
         throw ConfigIoException();
     }else{
+        #ifdef _DEBUG_
         std::cout<<"配置文件读取成功\n";
+        #endif
         string temp;
         string key_;
         string value_;
@@ -75,11 +78,15 @@ Analyzer::Analyzer(int argc,char **argv){
         map<string,string> conf;//用于存储配置文件信息的容器，<string,string> = <{设置项},{详细信息}>
         while(!fin.eof()){
             getline(fin,temp);
+            #ifdef _DEBUG_
             cout<<"debug:"<<temp<<endl;
+            #endif
             sign=temp.find_first_of(':');
             key_.assign(temp,0,sign++);
             value_.assign(temp,sign,temp.length()-sign);
+            #ifdef _DEBUG_
             cout<<"key:"<<key_<<"\tvalue"<<value_<<endl;
+            #endif
             conf.insert(pair<string,string>(key_,value_));
         }
         map<string,string>::iterator it;
@@ -90,26 +97,30 @@ Analyzer::Analyzer(int argc,char **argv){
         }
         #endif
         it=conf.find(string("dict"));
+        #ifdef _DEBUG_
         cout<<"迭代器赋值"<<endl;
+        #endif
         dict_file=it->second;
-        cout<<"访问迭代器元素"<<endl;
-        cout<<dict_file<<endl;//debug
         it=conf.find(string("cache"));
         cache_path=it->second;
-        cout<<cache_path<<endl;//
         it=conf.find(string("strange-word-dir"));
         strange_word_path=it->second;
-        cout<<strange_word_path<<endl;//
         it=conf.find(string("history-record"));
         his_path=it->second;
-        cout<<his_path<<endl;//
         it=conf.find(string("pri-query"));
         if(it->second==string("net")){
             pri_query=string("net");
         }else{
             pri_query=string("local");
         }
+        #ifdef _DEBUG_
+        cout<<"访问迭代器元素"<<endl;
+        cout<<dict_file<<endl;//debug
+        cout<<cache_path<<endl;//
+        cout<<strange_word_path<<endl;//
+        cout<<his_path<<endl;//
         cout<<pri_query<<endl;//
+        #endif
     }
 }
 bool Analyzer::check_arg(){
